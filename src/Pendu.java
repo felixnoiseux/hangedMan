@@ -10,8 +10,7 @@ public class Pendu {
      enum EtatsPartie {
         EnCours,
         Perdu,
-        Gagnant,
-         Terminer
+        Gagnant
     }
 
     char[] _acMotActuel;
@@ -21,13 +20,13 @@ public class Pendu {
 
     //region Proprietes
 
-    EtatsPartie etatPartie;
+    EtatsPartie etatPartie = EtatsPartie.EnCours;
     String lettresDemandees;
     String lettresRestantes = "abcdefghijklmnopqrstuvwxyz";
     String motActuel;
-    int nbPartiesGagnees;
-    int nbPartiesPerdues;
-    byte partiesCorps;
+    int nbPartiesGagnees = 0;
+    int nbPartiesPerdues = 0;
+    byte partiesCorps = 0;
     String reponse;
 
     public EtatsPartie getEtatPartie(){
@@ -99,6 +98,15 @@ public class Pendu {
 
     //region Methodes
 
+    private void VerifierFinPartie(){
+        String reponseUtilisateur = new String(_acMotActuel);
+        if(reponseUtilisateur.equals(reponse)){
+            etatPartie = EtatsPartie.Gagnant;
+        }
+        else if(getPartiesCorps() == (byte)6){
+            etatPartie = EtatsPartie.Perdu;
+        }
+    }
 
     public boolean ChargerFichierMots(String nomFichier){
         try {
@@ -175,17 +183,18 @@ public class Pendu {
             }
 
             if(estBonneLettre){
+                VerifierFinPartie();
                 return true;
             }
         }
 
+        VerifierFinPartie();
         return false;
     }
     public boolean ValiderMot(String mot){
 
-        if(mot == "QUITTER"){
-            etatPartie = EtatsPartie.Terminer;
-            return true;
+        if(mot.equals("QUITTER")){
+            System.exit(0);
         }
         //Nettoyage du mot;
         mot = mot.toLowerCase();
@@ -203,7 +212,9 @@ public class Pendu {
         reponseNettoye = reponseNettoye.replaceAll("[àâ]","a");
         reponseNettoye = reponseNettoye.replaceAll("ô","o");
 
-        if(mot == reponseNettoye){
+        if(mot.equals(reponseNettoye)){
+            _acMotActuel = reponse.toCharArray();
+            VerifierFinPartie();
             return true;
         }
 
