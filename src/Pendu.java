@@ -10,7 +10,8 @@ public class Pendu {
      enum EtatsPartie {
         EnCours,
         Perdu,
-        Gagnant
+        Gagnant,
+         Terminer
     }
 
     char[] _acMotActuel;
@@ -22,7 +23,7 @@ public class Pendu {
 
     EtatsPartie etatPartie;
     String lettresDemandees;
-    String lettresRestantes;
+    String lettresRestantes = "abcdefghijklmnopqrstuvwxyz";
     String motActuel;
     int nbPartiesGagnees;
     int nbPartiesPerdues;
@@ -37,16 +38,21 @@ public class Pendu {
     }
     public String getLettresDemandees(){
 
-        this.lettresDemandees = _lettresDemandees.toString();
+        String lettreDemande = "";
+        for(int i = 0; i < _lettresDemandees.size(); i++)
+        {
+            lettreDemande += _lettresDemandees.get(i);
+        }
+        lettresDemandees = lettreDemande;
         return lettresDemandees;
     }
     public String getLettresRestantes(){
-        this.lettresRestantes = "abcdefghijklmnopqrstuvwxyz";
         for(int i = 0; i < this.lettresRestantes.length(); i++){
 
-            for(int ii = 0; ii < this._lettresDemandees.size(); i++){
+            for(int ii = 0; ii < this._lettresDemandees.size(); ii++){
                 if(this.lettresRestantes.charAt(i) == _lettresDemandees.get(ii)){
-                    this.lettresRestantes.replace(this.lettresRestantes.charAt(i), '_');
+                    String replaceString = this.lettresRestantes.replace(this.lettresRestantes.charAt(i), '_');
+                    this.lettresRestantes = replaceString;
                 }
             }
 
@@ -92,6 +98,8 @@ public class Pendu {
     //endregion
 
     //region Methodes
+
+
     public boolean ChargerFichierMots(String nomFichier){
         try {
             File myObj = new File(nomFichier);
@@ -112,6 +120,9 @@ public class Pendu {
         //Choisir mot
         this.reponse = _mots.get(_rnd.nextInt(_mots.size()));
 
+        //Afficher Reponse pour test
+        System.out.println(this.reponse);
+
         //Definir mot Actuel
         _acMotActuel = new char[this.reponse.length()];
 
@@ -123,9 +134,80 @@ public class Pendu {
         return "";
     }
     public  boolean ValiderLettre(char cLettre){
+
+
+        //Nettoyage de la lettre
+        String sLettre = Character.toString(cLettre);
+        sLettre = sLettre.toLowerCase();
+        sLettre = sLettre.replaceAll("[èéêë]","e");
+        sLettre = sLettre.replaceAll("[ûù]","u");
+        sLettre = sLettre.replaceAll("[ïî]","i");
+        sLettre = sLettre.replaceAll("[àâ]","a");
+        sLettre = sLettre.replaceAll("ô","o");
+        cLettre = sLettre.charAt(0);
+
+
+        if(_lettresDemandees.contains(cLettre)){
+            return true;
+        }
+        else{
+            boolean estBonneLettre = false;
+            _lettresDemandees.add(cLettre);
+
+            for(int i = 0; i < reponse.length(); i++){
+
+                //Nettoyage de la reponse
+                String reponseNettoye = reponse.toLowerCase();
+                reponseNettoye = reponseNettoye.replaceAll("[èéêë]","e");
+                reponseNettoye = reponseNettoye.replaceAll("[ûù]","u");
+                reponseNettoye = reponseNettoye.replaceAll("[ïî]","i");
+                reponseNettoye = reponseNettoye.replaceAll("[àâ]","a");
+                reponseNettoye = reponseNettoye.replaceAll("ô","o");
+
+                if(reponseNettoye.charAt(i) == cLettre){
+                    String replaceString = this.lettresRestantes.replace(cLettre,'_');
+                    this.lettresRestantes = replaceString;
+
+                    _acMotActuel[i] = reponse.charAt(i);
+
+                    estBonneLettre = true;
+                }
+            }
+
+            if(estBonneLettre){
+                return true;
+            }
+        }
+
         return false;
     }
     public boolean ValiderMot(String mot){
+
+        if(mot == "QUITTER"){
+            etatPartie = EtatsPartie.Terminer;
+            return true;
+        }
+        //Nettoyage du mot;
+        mot = mot.toLowerCase();
+        mot = mot.replaceAll("[èéêë]","e");
+        mot = mot.replaceAll("[ûù]","u");
+        mot = mot.replaceAll("[ïî]","i");
+        mot = mot.replaceAll("[àâ]","a");
+        mot = mot.replaceAll("ô","o");
+
+        //Nettoyage de la reponse
+        String reponseNettoye = reponse.toLowerCase();
+        reponseNettoye = reponseNettoye.replaceAll("[èéêë]","e");
+        reponseNettoye = reponseNettoye.replaceAll("[ûù]","u");
+        reponseNettoye = reponseNettoye.replaceAll("[ïî]","i");
+        reponseNettoye = reponseNettoye.replaceAll("[àâ]","a");
+        reponseNettoye = reponseNettoye.replaceAll("ô","o");
+
+        if(mot == reponseNettoye){
+            return true;
+        }
+
+
         return false;
     }
     //endregion
